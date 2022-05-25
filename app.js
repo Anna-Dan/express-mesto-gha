@@ -18,11 +18,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// mongoose
+//   .connect("mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin", {
+//     useNewUrlParser: true,
+//   })
+//   .then(() => console.log("Mongo is connected"))
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
 mongoose
-  .connect("mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin", {
+  .connect("mongodb://localhost:27017/mestodb", {
     useNewUrlParser: true,
   })
-  .then(() => console.log("Mongo is connected"))
+  .then(() => console.log("DB is connected"))
   .catch((err) => {
     console.log(err);
   });
