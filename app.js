@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// mongoose
+// mongoose // вариант для локальной докер разработки
 //   .connect("mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin", {
 //     useNewUrlParser: true,
 //   })
@@ -27,11 +27,11 @@ app.use((req, res, next) => {
 //     console.log(err);
 //   });
 
-mongoose
+mongoose // вариант для прохождения автотестов
   .connect("mongodb://localhost:27017/mestodb", {
     useNewUrlParser: true,
   })
-  .then(() => console.log("DB is connected"))
+  .then(() => console.log("Mongo is connected"))
   .catch((err) => {
     console.log(err);
   });
