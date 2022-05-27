@@ -19,23 +19,23 @@ app.use((req, res, next) => {
   next();
 });
 
-mongoose // вариант для локальной докер разработки
-  .connect('mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin', {
+// mongoose // вариант для локальной докер разработки
+//   .connect('mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin', {
+//     useNewUrlParser: true,
+//   })
+//   .then(() => console.log('Mongo is connected'))
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
+mongoose // вариант для прохождения автотестов
+  .connect('mongodb://localhost:27017/mestodb', {
     useNewUrlParser: true,
   })
   .then(() => console.log('Mongo is connected'))
   .catch((err) => {
     console.log(err);
   });
-
-// // mongoose // вариант для прохождения автотестов
-// //   .connect("mongodb://localhost:27017/mestodb", {
-// //     useNewUrlParser: true,
-// //   })
-// //   .then(() => console.log("Mongo is connected"))
-// //   .catch((err) => {
-// //     console.log(err);
-// //   });
 
 app.use(cardRouter);
 app.use(userRouter);
