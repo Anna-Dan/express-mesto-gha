@@ -1,26 +1,10 @@
-const card = require("../models/card");
+const card = require('../models/card');
+const handleError = require('../constants/handleErrorCard');
 
 const {
-  ERROR_CODE_BAD_REQUEST,
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_DEFAULT,
-} = require("../constants/constants");
-
-function handleError(err, res) {
-  if (err.name === "ValidationError") {
-    return res
-      .status(ERROR_CODE_BAD_REQUEST)
-      .send({ message: "Переданы некорректные данные карточки" });
-  }
-  if (err.name === "CastError") {
-    return res
-      .status(ERROR_CODE_BAD_REQUEST)
-      .send({ message: "Переданы невалидные данные карточки" });
-  }
-  return res
-    .status(ERROR_CODE_DEFAULT)
-    .send({ message: "На сервере произошла ошибка" });
-}
+} = require('../constants/constants');
 
 // GET /cards — запрос на все карточки
 module.exports.getCards = (req, res) => {
@@ -32,7 +16,7 @@ module.exports.getCards = (req, res) => {
     .catch(() => {
       res
         .status(ERROR_CODE_DEFAULT)
-        .send({ message: "На сервере произошла ошибка" });
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -56,7 +40,7 @@ module.exports.deleteCard = (req, res) => {
       if (!cards) {
         return res
           .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: " Карточка с указанным _id не найдена." });
+          .send({ message: ' Карточка с указанным _id не найдена.' });
       }
       return res.status(200).send({ data: card });
     })
@@ -75,7 +59,7 @@ module.exports.likeCard = (req, res) => {
       if (!cards) {
         return res
           .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: "Передан несуществующий _id карточки." });
+          .send({ message: 'Передан несуществующий _id карточки.' });
       }
       return res.status(200).send({ data: cards });
     })
@@ -94,7 +78,7 @@ module.exports.dislikeCard = (req, res) => {
       if (!cards) {
         return res
           .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: "Передан несуществующий _id карточки." });
+          .send({ message: 'Передан несуществующий _id карточки.' });
       }
       return res.status(200).send({ data: cards });
     })

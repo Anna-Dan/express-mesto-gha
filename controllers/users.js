@@ -1,26 +1,10 @@
-const user = require("../models/user");
+const user = require('../models/user');
+const handleError = require('../constants/handleErrorUser');
 
 const {
-  ERROR_CODE_BAD_REQUEST,
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_DEFAULT,
-} = require("../constants/constants");
-
-function handleError(err, res) {
-  if (err.name === "ValidationError") {
-    return res.status(ERROR_CODE_BAD_REQUEST).send({
-      message: "Переданы некорректные данные пользователя",
-    });
-  }
-  if (err.name === "CastError") {
-    return res
-      .status(ERROR_CODE_BAD_REQUEST)
-      .send({ message: "Передан некорректный _id пользователя." });
-  }
-  return res
-    .status(ERROR_CODE_DEFAULT)
-    .send({ message: "На сервере произошла ошибка" });
-}
+} = require('../constants/constants');
 
 // GET /users — запрос всех пользователей
 module.exports.getUsers = (req, res) => {
@@ -32,7 +16,7 @@ module.exports.getUsers = (req, res) => {
     .catch(() => {
       res
         .status(ERROR_CODE_DEFAULT)
-        .send({ message: "На сервере произошла ошибка" });
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -44,7 +28,7 @@ module.exports.getUser = (req, res) => {
       if (!getUser) {
         res
           .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: "Пользователь по указанному _id не найден." });
+          .send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
         res.status(200).send({ data: getUser });
       }
@@ -75,10 +59,10 @@ module.exports.updateUserInfo = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((updateUser) => {
-      if (!user) {
+      if (!updateUser) {
         return res
           .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: "Пользователь с указанным _id не найден." });
+          .send({ message: 'Пользователь с указанным _id не найден.' });
       }
       return res.status(200).send({ data: updateUser });
     })
@@ -96,10 +80,10 @@ module.exports.updateAvatar = (req, res) => {
       { new: true, runValidators: true },
     )
     .then((updateUser) => {
-      if (!user) {
+      if (!updateUser) {
         return res
           .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: "Пользователь с указанным _id не найден." });
+          .send({ message: 'Пользователь с указанным _id не найден.' });
       }
       return res.status(200).send({ data: updateUser });
     })
