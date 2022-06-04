@@ -1,9 +1,11 @@
 const bcrypt = require('bcryptjs');
-const user = require('../models/user');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const handleError = require('../constants/handleErrorUser');
 const ConflictError = require('../errors/ConflictError');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const {
   ERROR_CODE_NOT_FOUND,
@@ -12,8 +14,7 @@ const {
 
 // GET /users — запрос всех пользователей
 module.exports.getUsers = (req, res) => {
-  user
-    .find({})
+  User.find({})
     .then((users) => {
       res.status(200).send({ data: users });
     })
@@ -26,8 +27,7 @@ module.exports.getUsers = (req, res) => {
 
 // GET /users/:userId - запрос пользователя по _id
 module.exports.getUser = (req, res) => {
-  user
-    .findById(req.params.userId)
+  User.findById(req.params.userId)
     .then((getUser) => {
       if (!getUser) {
         res
@@ -43,38 +43,36 @@ module.exports.getUser = (req, res) => {
 // POST /users — создать пользователя
 module.exports.createUser = (req, res, next) => {
   const {
-    name,
-    about,
-    avatar,
-    email,
-    password,
+    name, about, avatar, email, password,
   } = req.body;
 
   if (!email || !password) {
     return next(new NotFoundError('Не переданы email или пароль'));
   }
-  return bcrypt.hash(password, 10)
-    .then((hash) => user.create({
+  return bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({
       name,
       about,
       avatar,
       email,
       password: hash,
-    })
-      .then(() => res.status(200).send({
-        data: {
-          name,
-          about,
-          avatar,
-          email,
-        },
-      })))
+    }).then(() => res.status(200).send({
+      data: {
+        name,
+        about,
+        avatar,
+        email,
+      },
+    })))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Некорректные данные пользователя'));
       }
       if (err.code === 11000) {
-        return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+        return next(
+          new ConflictError('Пользователь с таким email уже зарегистрирован'),
+        );
       }
       return next(err);
     });
@@ -84,12 +82,11 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
 
-  user
-    .findByIdAndUpdate(
-      req.user._id,
-      { name, about },
-      { new: true, runValidators: true },
-    )
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    { new: true, runValidators: true },
+  )
     .then((updateUser) => {
       if (!updateUser) {
         return res
@@ -105,12 +102,11 @@ module.exports.updateUserInfo = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  user
-    .findByIdAndUpdate(
-      req.user._id,
-      { avatar },
-      { new: true, runValidators: true },
-    )
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true },
+  )
     .then((updateUser) => {
       if (!updateUser) {
         return res
@@ -120,4 +116,20 @@ module.exports.updateAvatar = (req, res) => {
       return res.status(200).send({ data: updateUser });
     })
     .catch((err) => handleError(err, res));
+};
+
+// /POST/signin - проверка логина и пароля
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    next(new BadRequestError('Введите почту и пароль'));
+  }
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+        expiresIn: '7d',
+      });
+      return res.status(200).send({ token });
+    })
+    .catch(() => next(new UnauthorizedError('Неправильная почта или пароль')));
 };

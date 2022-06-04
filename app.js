@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
 const { ERROR_CODE_NOT_FOUND } = require('./constants/constants');
 
 const { PORT = 3000 } = process.env;
@@ -36,6 +37,8 @@ mongoose // вариант для локальной докер разработ
 //   .catch((err) => {
 //     console.log(err);
 //   });
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use(cardRouter);
 app.use(userRouter);
