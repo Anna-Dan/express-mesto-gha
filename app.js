@@ -5,20 +5,13 @@ const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 const { ERROR_CODE_NOT_FOUND } = require('./constants/constants');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 app.use(bodyParser.json());
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '628e6eeb335ebab5307032fc',
-  };
-
-  next();
-});
 
 mongoose // вариант для локальной докер разработки
   .connect('mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin', {
@@ -39,6 +32,8 @@ mongoose // вариант для локальной докер разработ
 //   });
 app.post('/signin', login);
 app.post('/signup', createUser);
+
+app.use(auth);
 
 app.use(cardRouter);
 app.use(userRouter);

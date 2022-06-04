@@ -40,7 +40,19 @@ module.exports.getUser = (req, res) => {
     .catch((err) => handleError(err, res));
 };
 
-// POST /users — создать пользователя
+// GET /users/me - возвращает информацию о текущем пользователе
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById({ _id: req.user._id })
+    .then((user) => {
+      if (!user) {
+        return next(new NotFoundError('Пользователь не найден'));
+      }
+      return res.status(200).send({ data: user });
+    })
+    .catch((err) => next(err));
+};
+
+// POST /signup — создать пользователя
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
