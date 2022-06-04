@@ -1,5 +1,9 @@
+const bcrypt = require('bcryptjs');
 const user = require('../models/user');
 const handleError = require('../constants/handleErrorUser');
+const ConflictError = require('../errors/ConflictError');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 
 const {
   ERROR_CODE_NOT_FOUND,
@@ -37,15 +41,43 @@ module.exports.getUser = (req, res) => {
 };
 
 // POST /users — создать пользователя
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+module.exports.createUser = (req, res, next) => {
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  user
-    .create({ name, about, avatar })
-    .then((createUser) => {
-      res.status(200).send({ data: createUser });
+  if (!email || !password) {
+    return next(new NotFoundError('Не переданы email или пароль'));
+  }
+  return bcrypt.hash(password, 10)
+    .then((hash) => user.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
     })
-    .catch((err) => handleError(err, res));
+      .then(() => res.status(200).send({
+        data: {
+          name,
+          about,
+          avatar,
+          email,
+        },
+      })))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Некорректные данные пользователя'));
+      }
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      }
+      return next(err);
+    });
 };
 
 // PATCH /users/me — обновить профиль
