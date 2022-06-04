@@ -1,43 +1,32 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const handleError = require('../constants/handleErrorUser');
 const ConflictError = require('../errors/ConflictError');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
-const {
-  ERROR_CODE_NOT_FOUND,
-  ERROR_CODE_DEFAULT,
-} = require('../constants/constants');
-
 // GET /users — запрос всех пользователей
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.status(200).send({ data: users });
     })
-    .catch(() => {
-      res
-        .status(ERROR_CODE_DEFAULT)
-        .send({ message: 'На сервере произошла ошибка' });
-    });
+    .catch(next);
 };
 
 // GET /users/:userId - запрос пользователя по _id
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((getUser) => {
       if (!getUser) {
-        res
-          .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Пользователь по указанному _id не найден.' });
-      } else {
-        res.status(200).send({ data: getUser });
+        return next(
+          new NotFoundError('Пользователь по указанному _id не найден'),
+        );
       }
+      return res.status(200).send({ data: getUser });
     })
-    .catch((err) => handleError(err, res));
+    .catch(next);
 };
 
 // GET /users/me - возвращает информацию о текущем пользователе
@@ -79,7 +68,9 @@ module.exports.createUser = (req, res, next) => {
     })))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Некорректные данные пользователя'));
+        return next(
+          new BadRequestError('Переданы некорректные данные пользователя'),
+        );
       }
       if (err.code === 11000) {
         return next(
@@ -91,7 +82,7 @@ module.exports.createUser = (req, res, next) => {
 };
 
 // PATCH /users/me — обновить профиль
-module.exports.updateUserInfo = (req, res) => {
+module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -101,17 +92,24 @@ module.exports.updateUserInfo = (req, res) => {
   )
     .then((updateUser) => {
       if (!updateUser) {
-        return res
-          .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Пользователь с указанным _id не найден.' });
+        return next(
+          new NotFoundError('Пользователь с указанным _id не найден'),
+        );
       }
       return res.status(200).send({ data: updateUser });
     })
-    .catch((err) => handleError(err, res));
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return next(
+          new BadRequestError('Переданы некорректные данные пользователя'),
+        );
+      }
+      return next(err);
+    });
 };
 
 // PATCH /users/me/avatar — обновить аватар
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -121,13 +119,20 @@ module.exports.updateAvatar = (req, res) => {
   )
     .then((updateUser) => {
       if (!updateUser) {
-        return res
-          .status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Пользователь с указанным _id не найден.' });
+        return next(
+          new NotFoundError('Пользователь с указанным _id не найден'),
+        );
       }
       return res.status(200).send({ data: updateUser });
     })
-    .catch((err) => handleError(err, res));
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return next(
+          new BadRequestError('Переданы некорректные данные пользователя'),
+        );
+      }
+      return next(err);
+    });
 };
 
 // /POST/signin - проверка логина и пароля
