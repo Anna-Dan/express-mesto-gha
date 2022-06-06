@@ -10,7 +10,7 @@ const UnauthorizedError = require('../errors/UnauthorizedError');
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      res.status(200).send({ data: users });
+      res.send({ data: users });
     })
     .catch(next);
 };
@@ -24,7 +24,7 @@ module.exports.getUser = (req, res, next) => {
           new NotFoundError('Пользователь по указанному _id не найден'),
         );
       }
-      return res.status(200).send({ data: getUser });
+      return res.send({ data: getUser });
     })
     .catch(next);
 };
@@ -36,7 +36,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => next(err));
 };
@@ -58,7 +58,7 @@ module.exports.createUser = (req, res, next) => {
       avatar,
       email,
       password: hash,
-    }).then(() => res.status(200).send({
+    }).then(() => res.send({
       data: {
         name,
         about,
@@ -96,7 +96,7 @@ module.exports.updateUserInfo = (req, res, next) => {
           new NotFoundError('Пользователь с указанным _id не найден'),
         );
       }
-      return res.status(200).send({ data: updateUser });
+      return res.send({ data: updateUser });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -123,7 +123,7 @@ module.exports.updateAvatar = (req, res, next) => {
           new NotFoundError('Пользователь с указанным _id не найден'),
         );
       }
-      return res.status(200).send({ data: updateUser });
+      return res.send({ data: updateUser });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -146,7 +146,7 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
         expiresIn: '7d',
       });
-      return res.status(200).send({ token });
+      return res.send({ token });
     })
     .catch(() => next(new UnauthorizedError('Неправильная почта или пароль')));
 };
