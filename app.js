@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
 const NotFoundError = require('./errors/NotFoundError');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
@@ -19,19 +20,21 @@ const app = express();
 
 app.use(bodyParser.json());
 
-// mongoose // вариант для локальной докер разработки
-//   .connect('mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin', {
-//     useNewUrlParser: true,
-//   });
-
-mongoose // вариант для прохождения автотестов
-  .connect('mongodb://localhost:27017/mestodb', {
+mongoose // вариант для локальной докер разработки
+  .connect('mongodb://anna:dryanna@mongo:27017/mestodb?authSource=admin', {
     useNewUrlParser: true,
   });
+
+// mongoose // вариант для прохождения автотестов
+//   .connect('mongodb://localhost:27017/mestodb', {
+//     useNewUrlParser: true,
+//   });
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
+
+app.use(requestLogger);
 
 app.post('/signin', signInValidation, login);
 app.post('/signup', signUpValidation, createUser);
@@ -40,6 +43,8 @@ app.use(auth);
 
 app.use(cardRouter);
 app.use(userRouter);
+
+app.use(errorLogger);
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Такой страницы не существует'));
