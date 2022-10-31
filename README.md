@@ -5,7 +5,7 @@
 
 ## Описание
 
-Это REST API для проекта React-masto-auth (https://github.com/Anna-Dan/react-mesto-auth) реализовано с помощью Node.js, Express.js, MongoDB и Mongoose.js. 
+Это REST API для проекта React-mesto-auth (https://github.com/Anna-Dan/react-mesto-auth) реализовано с помощью Node.js, Express.js, MongoDB и Mongoose.js. 
 
 ## Функциональность
 
