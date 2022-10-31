@@ -1,31 +1,50 @@
-[![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+# Express-mesto-gha
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
 
+## Описание
 
+Это REST API для проекта React-masto-auth (https://github.com/Anna-Dan/react-mesto-auth) реализовано с помощью Node.js, Express.js, MongoDB и Mongoose.js. 
 
-## Настройка бейджей статуса тестов
-Перед началом работы над проектом рекомендуется исправить бейджи, отражающие статус прохождения тестов.
-Для этого замените разметку бейджей на следующий фрагмент, подставив вместо `${имя_пользователя}` и `${имя_репозитория}` соответствующие значения.
+## Функциональность
 
+– Регистрация и авторизация
+
+– Обновление данных пользователя
+
+– Создание и удаление карточки
+
+– Добавление и удаление лайка
+
+– Обработка ошибок
+
+– Валидация входящих данных
+
+– Логирование ошибок
+   
+## Локальная сборка и запуск проекта
+
+Клонируйте репозиторий
+
+```bash
+  git clone https://github.com/Anna-Dan/express-mesto-gha.git
 ```
-[![Tests for sprint 13](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-13-sprint.yml) 
 
-[![Tests for sprint 14](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml)
+Перейдите в директорию проекта
+
+```bash
+  cd express-mesto-gha
 ```
 
+Установите зависимости
 
-## Директории
+```bash
+  npm install
+```
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
-  
-Остальные директории вспомогательные, создаются при необходимости разработчиком
+Запустите проект
 
-## Запуск проекта
-
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
-
-## Ссылка на репозиторий
-(https://github.com/Anna-Dan/express-mesto-gha)
+```bash
+  npm run dev
+```
